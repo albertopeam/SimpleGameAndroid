@@ -1,5 +1,6 @@
 package es.dev.game.app;
 
+import org.cocos2d.layers.CCScene;
 import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.opengl.CCGLSurfaceView;
 
@@ -43,6 +44,12 @@ public class Activity_SimpleGame extends Activity {
     	CCDirector.sharedDirector().attachInView(_glSurfaceView);
     	CCDirector.sharedDirector().setDisplayFPS(true);
     	CCDirector.sharedDirector().setAnimationInterval(1.0f / 60.0f);
+    	
+    	/*
+    	 * creates the scene with the objects
+    	 */
+    	CCScene scene = GameLayer.scene();
+    	CCDirector.sharedDirector().runWithScene(scene);
     }
     
     /** Called when the activity goes to second plane */
