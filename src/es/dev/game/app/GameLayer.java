@@ -18,29 +18,35 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import static es.dev.game.config.Constants.*;
+
 public class GameLayer extends CCColorLayer implements SensorEventListener{
 
-    private Sensor mAccelerometer = null;
     private static CCSprite player;
     private static CGPoint point;
     private static CGSize winSize;
+    private static float playerWidth;
+    private static float playerHeigth;
 	
-	protected GameLayer(ccColor4B color,Sensor mAccelerometer) {
+	protected GameLayer(ccColor4B color) {
 		super(color);
-		/*
-		 * 
-		 */
-        this.mAccelerometer = mAccelerometer;
+
         this.registerWithAccelerometer();
         
 		winSize = CCDirector.sharedDirector().displaySize();
 		player = CCSprite.sprite("player.png");
+		
+		playerWidth = player.getContentSize().width;
+		playerHeigth = player.getContentSize().height; 
 		 
 		point = CGPoint.ccp(winSize.width / 2.0f, winSize.height / 2.0f);
 		player.setPosition(point);
 		 
 		addChild(player);
 		
+		/*
+		 * adds a call to the gameLogic method every 1/2 second
+		 */
 		this.schedule("gameLogic", 0.5f);
 	}
 
@@ -48,9 +54,9 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	 * Creates a new scene 
 	 * @return
 	 */
-	public static CCScene scene(Sensor mAccelerometer){
+	public static CCScene scene(){
 		CCScene scene = CCScene.node();
-		CCColorLayer layer = new GameLayer(ccColor4B.ccc4(255, 255, 255, 255), mAccelerometer);
+		CCColorLayer layer = new GameLayer(ccColor4B.ccc4(255, 255, 255, 255));
 
 		scene.addChild(layer);
 		
@@ -94,7 +100,7 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	}
 	
 	/**
-	 * 
+	 * Destroys a sprite when it comes over the screen
 	 * @param sender
 	 */
 	public void spriteMoveFinished(Object sender)
@@ -104,7 +110,7 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	}
 	
 	/**
-	 * 
+	 * Adds the game logic to plays against
 	 * @param dt
 	 */
 	public void gameLogic(float dt)
@@ -112,41 +118,94 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	    addTarget();
 	}
 	
+	/**
+	 * Not implemented
+	 */
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		System.out.println("ON ACCURACY CHANGED");
-    }
+		if (DEBUG)
+			System.out.println("GameLayer.Class,  OnAccuracyChanged");    }
 
+	/**
+	 * Manage Accelerometer to gameLogic
+	 */
 	@Override
     public void onSensorChanged(SensorEvent event) {
-		System.out.println("ON SENSOR CHANGED");
-		System.out.println("wi"+winSize.width);
-		System.out.println("He"+winSize.height);
-		System.out.println("x"+point.x);
-		System.out.println("y"+point.y);
-
-		
-		if (point.x >= 30.0f && point.x <= (winSize.width - 30)){
-			point.x += event.values[1] / 1.2f;
+		if (DEBUG)
+			System.out.println("GameLayer.Class,  OnSensorChanged");
+		if (point.x >= playerWidth && point.x <= (winSize.width - playerWidth)){			//Dentro de las posiciones validas del eje X
+			point.x += event.values[AxisX];
 		}else{
-			if ( point.x <= 30.0f )
-				point.x = 30.0f;
-			else
-				point.x = winSize.width - 30;
+			if ( point.x < playerWidth && point.x + event.values[AxisX] >= point.x){		//Retorno de minima pos eje X
+				point.x += event.values[AxisX];
+			}else if ( point.x > (winSize.width - playerWidth) && point.x + event.values[AxisX] <= point.x ){		//Retorno de max. pos eje y
+				point.x += event.values[AxisX];
+			}
 		}
-		if (point.y >= 30.0f && point.y <= (winSize.height - 30)){
-			point.y -= event.values[0] / 1.2f;
+		
+		if (point.y >= playerHeigth && point.y <= (winSize.height - playerHeigth)){			//Dentro de las posiciones validas del eje X
+			point.y -= event.values[AxisY];
 		}else {
-			if ( point.y <= 30.0f )
-				point.y = 30.0f;
-			else
-				point.y = winSize.height - 30;
+			if ( point.y < playerHeigth && point.y - event.values[AxisY] >= point.y){		//Retorno de minima pos eje Y
+				point.y -= event.values[AxisY];
+			}else if ( point.y > (winSize.height - playerHeigth) && point.y - event.values[AxisY] <= point.y ){		//Retorno de max. pos eje y
+				point.y -= event.values[AxisY];
+			}
 		}
-			
 		player.setPosition(point);
     }
 	
+	/**
+	 * Updates the IU calculating the collisions
+	 * @param dt
+	 */
+	public void update(float dt)
+	{
+		/*
+	    ArrayList<CCSprite> projectilesToDelete = new ArrayList<CCSprite>();
+	 
+	    for (CCSprite projectile : _projectiles)
+	    {
+	        CGRect projectileRect = CGRect.make(projectile.getPosition().x - (projectile.getContentSize().width / 2.0f),
+	                                            projectile.getPosition().y - (projectile.getContentSize().height / 2.0f),
+	                                            projectile.getContentSize().width,
+	                                            projectile.getContentSize().height);
+	 
+	        ArrayList<CCSprite> targetsToDelete = new ArrayList<CCSprite>();
+	 
+	        for (CCSprite target : _targets)
+	        {
+	            CGRect targetRect = CGRect.make(target.getPosition().x - (target.getContentSize().width),
+	                                            target.getPosition().y - (target.getContentSize().height),
+	                                            target.getContentSize().width,
+	                                            target.getContentSize().height);
+	 
+	            if (CGRect.intersects(projectileRect, targetRect))
+	                targetsToDelete.add(target);
+	        }
+	 
+	        for (CCSprite target : targetsToDelete)
+	        {
+	            _targets.remove(target);
+	            removeChild(target, true);
+	        }
+	 
+	        if (targetsToDelete.size() > 0)
+	            projectilesToDelete.add(projectile);
+	    }
+	 
+	    for (CCSprite projectile : projectilesToDelete)
+	    {
+	        _projectiles.remove(projectile);
+	        removeChild(projectile, true);
+	    }
+	    */
+	}
+
 	
+	/**
+	 * Called when go out from this layer
+	 */
 	@Override
 	public void onExit() {
 		super.onExit();

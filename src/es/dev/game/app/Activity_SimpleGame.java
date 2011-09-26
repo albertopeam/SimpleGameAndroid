@@ -23,11 +23,6 @@ public class Activity_SimpleGame extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         /*
-         * Set up sensors
-         */
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        /*
          * This sets up the OpenGL surface for Cocos2D to utilise. 
          * We set some flags to ensure we always have a fullscreen view, then display the view to the user.
          */
@@ -56,7 +51,7 @@ public class Activity_SimpleGame extends Activity {
     	/*
     	 * creates the scene with the objects
     	 */
-    	CCScene scene = GameLayer.scene(mAccelerometer);
+    	CCScene scene = GameLayer.scene();
     	CCDirector.sharedDirector().runWithScene(scene);
     }
     
