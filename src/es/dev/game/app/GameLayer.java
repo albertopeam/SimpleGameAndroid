@@ -13,28 +13,44 @@ import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGSize;
 import org.cocos2d.types.ccColor4B;
 
-public class GameLayer extends CCColorLayer{
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 
+public class GameLayer extends CCColorLayer implements SensorEventListener{
+
+    private Sensor mAccelerometer = null;
+    private static CCSprite player;
+    private static CGPoint point;
+    private static CGSize winSize;
 	
-	protected GameLayer(ccColor4B color) {
+	protected GameLayer(ccColor4B color,Sensor mAccelerometer) {
 		super(color);
-		CGSize winSize = CCDirector.sharedDirector().displaySize();
-		CCSprite player = CCSprite.sprite("player.png");
+		/*
+		 * 
+		 */
+        this.mAccelerometer = mAccelerometer;
+        this.registerWithAccelerometer();
+        
+		winSize = CCDirector.sharedDirector().displaySize();
+		player = CCSprite.sprite("player.png");
 		 
-		player.setPosition(CGPoint.ccp(player.getContentSize().width / 2.0f, winSize.height / 2.0f));
+		point = CGPoint.ccp(winSize.width / 2.0f, winSize.height / 2.0f);
+		player.setPosition(point);
 		 
 		addChild(player);
 		
-		this.schedule("gameLogic", 1.0f);
+		this.schedule("gameLogic", 0.5f);
 	}
 
 	/**
 	 * Creates a new scene 
 	 * @return
 	 */
-	public static CCScene scene(){
+	public static CCScene scene(Sensor mAccelerometer){
 		CCScene scene = CCScene.node();
-		CCColorLayer layer = new GameLayer(ccColor4B.ccc4(255, 255, 255, 255));
+		CCColorLayer layer = new GameLayer(ccColor4B.ccc4(255, 255, 255, 255), mAccelerometer);
 
 		scene.addChild(layer);
 		
@@ -94,6 +110,47 @@ public class GameLayer extends CCColorLayer{
 	public void gameLogic(float dt)
 	{
 	    addTarget();
+	}
+	
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		System.out.println("ON ACCURACY CHANGED");
+    }
+
+	@Override
+    public void onSensorChanged(SensorEvent event) {
+		System.out.println("ON SENSOR CHANGED");
+		System.out.println("wi"+winSize.width);
+		System.out.println("He"+winSize.height);
+		System.out.println("x"+point.x);
+		System.out.println("y"+point.y);
+
+		
+		if (point.x >= 30.0f && point.x <= (winSize.width - 30)){
+			point.x += event.values[1] / 1.2f;
+		}else{
+			if ( point.x <= 30.0f )
+				point.x = 30.0f;
+			else
+				point.x = winSize.width - 30;
+		}
+		if (point.y >= 30.0f && point.y <= (winSize.height - 30)){
+			point.y -= event.values[0] / 1.2f;
+		}else {
+			if ( point.y <= 30.0f )
+				point.y = 30.0f;
+			else
+				point.y = winSize.height - 30;
+		}
+			
+		player.setPosition(point);
+    }
+	
+	
+	@Override
+	public void onExit() {
+		super.onExit();
+		this.unregisterWithAccelerometer();
 	}
 
 }

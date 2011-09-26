@@ -5,6 +5,8 @@ import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.opengl.CCGLSurfaceView;
 
 import android.app.Activity;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -12,13 +14,19 @@ import android.view.WindowManager;
 public class Activity_SimpleGame extends Activity {
 	
 	protected CCGLSurfaceView _glSurfaceView;
+    private SensorManager mSensorManager = null;
+    private Sensor mAccelerometer = null;
 	
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+        /*
+         * Set up sensors
+         */
+        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         /*
          * This sets up the OpenGL surface for Cocos2D to utilise. 
          * We set some flags to ensure we always have a fullscreen view, then display the view to the user.
@@ -48,7 +56,7 @@ public class Activity_SimpleGame extends Activity {
     	/*
     	 * creates the scene with the objects
     	 */
-    	CCScene scene = GameLayer.scene();
+    	CCScene scene = GameLayer.scene(mAccelerometer);
     	CCDirector.sharedDirector().runWithScene(scene);
     }
     
@@ -62,7 +70,7 @@ public class Activity_SimpleGame extends Activity {
     /** Called before onStart*/
     @Override
     protected void onResume() {
-    	super.onResume();
+    	super.onResume();    	
     	CCDirector.sharedDirector().resume();
     }
     /** Called when the activity is stopped*/
