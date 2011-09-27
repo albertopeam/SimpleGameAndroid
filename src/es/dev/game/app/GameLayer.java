@@ -1,5 +1,6 @@
 package es.dev.game.app;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.cocos2d.actions.instant.CCCallFuncN;
@@ -10,6 +11,7 @@ import org.cocos2d.layers.CCScene;
 import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.nodes.CCSprite;
 import org.cocos2d.types.CGPoint;
+import org.cocos2d.types.CGRect;
 import org.cocos2d.types.CGSize;
 import org.cocos2d.types.ccColor4B;
 
@@ -24,8 +26,9 @@ import static es.dev.game.config.Constants.*;
 
 public class GameLayer extends CCColorLayer implements SensorEventListener{
 
-	private static CCSprite background;
+	protected ArrayList<CCSprite> targets;
 	
+	private static CCSprite background;
     private static CCSprite player;
     private static CGPoint point;
     private static CGSize winSize;
@@ -36,6 +39,8 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 		super(color);
 
         this.registerWithAccelerometer();
+        
+        targets = new ArrayList<CCSprite>();
         
 		winSize = CCDirector.sharedDirector().displaySize();
 		player = CCSprite.sprite("player.png");
@@ -56,6 +61,7 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 		 * adds a call to the gameLogic method every 1/2 second
 		 */
 		this.schedule("gameLogic", 0.5f);
+		this.schedule("update");
 	}
 
 	/**
@@ -92,6 +98,8 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	    pos.y = actualY;
 	    target.setPosition(pos);
 	    addChild(target);
+	    
+	    targets.add(target);
 	 
 	    // Determine speed of the target
 	    int minDuration = 2;
@@ -167,47 +175,30 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	 * Updates the IU calculating the collisions
 	 * @param dt
 	 */
-	public void update(float dt)
-	{
+	public void update(float dt){
 		/*
-	    ArrayList<CCSprite> projectilesToDelete = new ArrayList<CCSprite>();
-	 
-	    for (CCSprite projectile : _projectiles)
-	    {
-	        CGRect projectileRect = CGRect.make(projectile.getPosition().x - (projectile.getContentSize().width / 2.0f),
-	                                            projectile.getPosition().y - (projectile.getContentSize().height / 2.0f),
-	                                            projectile.getContentSize().width,
-	                                            projectile.getContentSize().height);
-	 
-	        ArrayList<CCSprite> targetsToDelete = new ArrayList<CCSprite>();
-	 
-	        for (CCSprite target : _targets)
-	        {
-	            CGRect targetRect = CGRect.make(target.getPosition().x - (target.getContentSize().width),
-	                                            target.getPosition().y - (target.getContentSize().height),
-	                                            target.getContentSize().width,
-	                                            target.getContentSize().height);
-	 
-	            if (CGRect.intersects(projectileRect, targetRect))
-	                targetsToDelete.add(target);
-	        }
-	 
-	        for (CCSprite target : targetsToDelete)
-	        {
-	            _targets.remove(target);
-	            removeChild(target, true);
-	        }
-	 
-	        if (targetsToDelete.size() > 0)
-	            projectilesToDelete.add(projectile);
-	    }
-	 
-	    for (CCSprite projectile : projectilesToDelete)
-	    {
-	        _projectiles.remove(projectile);
-	        removeChild(projectile, true);
-	    }
-	    */
+		 * Creates a RECT for player
+		*/
+		 CGRect playerRect = CGRect.make(player.getPosition().x - (player.getContentSize().width / 2.0f),
+                 player.getPosition().y - (player.getContentSize().height / 2.0f),
+                 player.getContentSize().width,
+                 player.getContentSize().height);
+		
+		
+
+		 /* Search for intersections between player and enemies*/
+        for (CCSprite target : targets){
+            CGRect targetRect = CGRect.make(target.getPosition().x - (target.getContentSize().width),
+                                            target.getPosition().y - (target.getContentSize().height),
+                                            target.getContentSize().width,
+                                            target.getContentSize().height);
+ 
+            if (CGRect.intersects(playerRect, targetRect)){
+            	targets.remove(target);
+            	removeChild(target, true);
+            }
+        }
+	    
 	}
 
 	
