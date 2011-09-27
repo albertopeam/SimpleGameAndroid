@@ -13,15 +13,19 @@ import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGSize;
 import org.cocos2d.types.ccColor4B;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.view.SoundEffectConstants;
 
 import static es.dev.game.config.Constants.*;
 
 public class GameLayer extends CCColorLayer implements SensorEventListener{
 
+	private static CCSprite background;
+	
     private static CCSprite player;
     private static CGPoint point;
     private static CGSize winSize;
@@ -42,7 +46,18 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 		point = CGPoint.ccp(winSize.width / 2.0f, winSize.height / 2.0f);
 		player.setPosition(point);
 		 
-		addChild(player);
+		addChild(player,1);
+		
+		/*Adds a background to the scene*/
+		background = CCSprite.sprite("background.png");		//TODO: puede ser en 2D!!!
+		background.setPosition(CGPoint.ccp(winSize.width / 2.0f, winSize.height / 2.0f));
+		addChild(background, 0);
+		/*
+		 * Sound effects
+		 */
+		Context context = CCDirector.sharedDirector().getActivity();
+		//SoundEngine.sharedEngine().playSound(context, R.raw.background_music_aac, true);
+		
 		
 		/*
 		 * adds a call to the gameLogic method every 1/2 second
