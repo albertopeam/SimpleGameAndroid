@@ -26,7 +26,7 @@ public class Activity_SimpleGame extends Activity {
         CCDirector.sharedDirector().getActivity();
 
         // Preload background music
-        SoundEngine.sharedEngine().preloadSound(this, R.raw.background_music_aac);
+        SoundEngine.sharedEngine().preloadSound(this, R.raw.opening_song);
         
         /*
          * This sets up the OpenGL surface for Cocos2D to utilise. 
@@ -60,7 +60,7 @@ public class Activity_SimpleGame extends Activity {
     	CCScene scene = GameLayer.scene();
     	CCDirector.sharedDirector().runWithScene(scene);
     	
-        SoundEngine.sharedEngine().playSound(this, R.raw.background_music_aac, true);
+        SoundEngine.sharedEngine().playSound(this, R.raw.opening_song, true);
         _soundPlaying = true;
     }
     
