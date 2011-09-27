@@ -3,6 +3,7 @@ package es.dev.game.app;
 import org.cocos2d.layers.CCScene;
 import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.opengl.CCGLSurfaceView;
+import org.cocos2d.sound.*;
 
 import android.app.Activity;
 import android.hardware.Sensor;
@@ -14,14 +15,19 @@ import android.view.WindowManager;
 public class Activity_SimpleGame extends Activity {
 	
 	protected CCGLSurfaceView _glSurfaceView;
-    private SensorManager mSensorManager = null;
-    private Sensor mAccelerometer = null;
-	
+    private boolean _soundPlaying = false;
+    private boolean _soundPaused = false;
+    private boolean _resumeSound = false;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CCDirector.sharedDirector().getActivity();
+
+        // Preload background music
+        SoundEngine.sharedEngine().preloadSound(this, R.raw.background_music_aac);
+        
         /*
          * This sets up the OpenGL surface for Cocos2D to utilise. 
          * We set some flags to ensure we always have a fullscreen view, then display the view to the user.
@@ -53,6 +59,9 @@ public class Activity_SimpleGame extends Activity {
     	 */
     	CCScene scene = GameLayer.scene();
     	CCDirector.sharedDirector().runWithScene(scene);
+    	
+        SoundEngine.sharedEngine().playSound(this, R.raw.background_music_aac, true);
+        _soundPlaying = true;
     }
     
     /** Called when the activity goes to second plane */
@@ -60,6 +69,17 @@ public class Activity_SimpleGame extends Activity {
     protected void onPause() {
     	super.onPause();
     	CCDirector.sharedDirector().pause();
+    	
+
+        // If the sound is loaded and not paused, pause it - but flag that we want it resumed
+        if (_soundPlaying && !_soundPaused)
+        {
+            SoundEngine.sharedEngine().pauseSound();
+            _soundPaused = true;
+            _resumeSound = true;
+        }
+        else
+            _resumeSound = false; // No sound playing, don't resume
     }
     
     /** Called before onStart*/
@@ -67,11 +87,30 @@ public class Activity_SimpleGame extends Activity {
     protected void onResume() {
     	super.onResume();    	
     	CCDirector.sharedDirector().resume();
+    	
+        // Resume playing sound only if it's loaded, paused and we want to resume it
+        if (_soundPlaying && _soundPaused && _resumeSound)
+        {
+            SoundEngine.sharedEngine().resumeSound();
+            _soundPaused = false;
+        }
     }
     /** Called when the activity is stopped*/
     @Override
     protected void onStop() {
     	super.onStop();
     	CCDirector.sharedDirector().end();
+    }
+    
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();
+
+        // Clean everything up
+        SoundEngine.sharedEngine().realesAllSounds();
+        SoundEngine.sharedEngine().realesAllEffects();
+
+        // Completely shut down the sound system
+        SoundEngine.purgeSharedEngine();
     }
 }

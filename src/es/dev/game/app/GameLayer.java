@@ -53,13 +53,6 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 		background.setPosition(CGPoint.ccp(winSize.width / 2.0f, winSize.height / 2.0f));
 		addChild(background, 0);
 		/*
-		 * Sound effects
-		 */
-		Context context = CCDirector.sharedDirector().getActivity();
-		//SoundEngine.sharedEngine().playSound(context, R.raw.background_music_aac, true);
-		
-		
-		/*
 		 * adds a call to the gameLogic method every 1/2 second
 		 */
 		this.schedule("gameLogic", 0.5f);
