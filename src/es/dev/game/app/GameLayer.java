@@ -9,11 +9,14 @@ import org.cocos2d.actions.interval.CCSequence;
 import org.cocos2d.layers.CCColorLayer;
 import org.cocos2d.layers.CCScene;
 import org.cocos2d.nodes.CCDirector;
+import org.cocos2d.nodes.CCNode;
 import org.cocos2d.nodes.CCSprite;
 import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGRect;
 import org.cocos2d.types.CGSize;
 import org.cocos2d.types.ccColor4B;
+import org.cocos2d.sound.*;
+
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -21,11 +24,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.view.SoundEffectConstants;
+import android.widget.TextView;
 
 import static es.dev.game.config.Constants.*;
 
 public class GameLayer extends CCColorLayer implements SensorEventListener{
 
+	private Context context; 
+	
 	protected ArrayList<CCSprite> targets;
 	
 	private static CCSprite background;
@@ -37,7 +43,9 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	
 	protected GameLayer(ccColor4B color) {
 		super(color);
-
+		
+		context = CCDirector.sharedDirector().getActivity();
+		
         this.registerWithAccelerometer();
         
         targets = new ArrayList<CCSprite>();
@@ -51,12 +59,12 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 		point = CGPoint.ccp(winSize.width / 2.0f, winSize.height / 2.0f);
 		player.setPosition(point);
 		 
-		addChild(player,1);
+		addChild(player);
 		
 		/*Adds a background to the scene*/
-		background = CCSprite.sprite("background.png");		//TODO: puede ser en 2D!!!
-		background.setPosition(CGPoint.ccp(winSize.width / 2.0f, winSize.height / 2.0f));
-		addChild(background, 0);
+		//background = CCSprite.sprite("background.png");		//TODO: puede ser en 2D!!!
+		//background.setPosition(CGPoint.ccp(winSize.width / 2.0f, winSize.height / 2.0f));
+		//addChild(background, 0);
 		/*
 		 * adds a call to the gameLogic method every 1/2 second
 		 */
@@ -70,7 +78,7 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	 */
 	public static CCScene scene(){
 		CCScene scene = CCScene.node();
-		CCColorLayer layer = new GameLayer(ccColor4B.ccc4(255, 255, 255, 255));
+		CCColorLayer layer = new GameLayer(ccColor4B.ccc4(0, 0, 0, 0));
 
 		scene.addChild(layer);
 		
@@ -169,7 +177,7 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 			}
 		}
 		player.setPosition(point);
-    }
+	}
 	
 	/**
 	 * Updates the IU calculating the collisions
@@ -178,13 +186,11 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	public void update(float dt){
 		/*
 		 * Creates a RECT for player
-		*/
+		*/ 
 		 CGRect playerRect = CGRect.make(player.getPosition().x - (player.getContentSize().width / 2.0f),
                  player.getPosition().y - (player.getContentSize().height / 2.0f),
-                 player.getContentSize().width,
-                 player.getContentSize().height);
-		
-		
+                 player.getContentSize().width -25,
+                 player.getContentSize().height - 20);		
 
 		 /* Search for intersections between player and enemies*/
         for (CCSprite target : targets){
@@ -194,6 +200,7 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
                                             target.getContentSize().height);
  
             if (CGRect.intersects(playerRect, targetRect)){
+            	SoundEngine.sharedEngine().playEffect(context, R.raw.eating);
             	targets.remove(target);
             	removeChild(target, true);
             }
