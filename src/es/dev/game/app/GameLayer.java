@@ -33,7 +33,7 @@ import static es.dev.game.config.Constants.*;
 public class GameLayer extends CCColorLayer implements SensorEventListener{
 
 	private Context context; 
-	private  static CCLabel punctuation;
+	private  static CCLabel scoreLabel;
 	protected ArrayList<CCSprite> targets;
 	
 	//private static CCSprite background;
@@ -42,17 +42,19 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
     private static CGSize winSize;
     private static float playerWidth;
     private static float playerHeigth;
-    private static int points;
+    private static int points = 0;
 	
 	protected GameLayer(ccColor4B color) {
 		super(color);
 		
 		context = CCDirector.sharedDirector().getActivity();
 		
+		refreshScore();
+		/*
 		punctuation = CCLabel.makeLabel("Ptos: 0", CGSize.make(100.0f, 25.0f), TextAlignment.CENTER, "DEFAULT", 20.0f);
 		punctuation.setPosition(CGPoint.make(720, 450));
 		addChild(punctuation);
-	
+	*/
         this.registerWithAccelerometer();
         
         targets = new ArrayList<CCSprite>();
@@ -211,15 +213,21 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
             	targets.remove(target);
             	removeChild(target, true);
             	points++;
-            	removeChild(punctuation, true);
-            	punctuation = CCLabel.makeLabel("Ptos: "+points, CGSize.make(100.0f, 25.0f), TextAlignment.CENTER, "DEFAULT", 20.0f);
-        		punctuation.setPosition(CGPoint.make(720, 450));
-        		addChild(punctuation);
+            	removeChild(scoreLabel, true);
+            	refreshScore();
             }
         }
 	    
 	}
 
+	/**
+	 * Refresh the Punctuation
+	 */
+	private void refreshScore(){
+    	scoreLabel = CCLabel.makeLabel("Score: "+ points, CGSize.make(100.0f, 25.0f), TextAlignment.CENTER, "DEFAULT", 20.0f);
+		scoreLabel.setPosition(CGPoint.make(720, 450));
+		addChild(scoreLabel);
+	}
 	
 	/**
 	 * Called when go out from this layer
