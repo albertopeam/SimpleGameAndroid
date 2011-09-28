@@ -5,6 +5,8 @@ import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.opengl.CCGLSurfaceView;
 import org.cocos2d.sound.*;
 
+import es.dev.game.layer.GameLayer;
+
 import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
