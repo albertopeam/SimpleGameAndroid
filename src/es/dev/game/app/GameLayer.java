@@ -9,8 +9,10 @@ import org.cocos2d.actions.interval.CCSequence;
 import org.cocos2d.layers.CCColorLayer;
 import org.cocos2d.layers.CCScene;
 import org.cocos2d.nodes.CCDirector;
+import org.cocos2d.nodes.CCLabel;
 import org.cocos2d.nodes.CCNode;
 import org.cocos2d.nodes.CCSprite;
+import org.cocos2d.nodes.CCLabel.TextAlignment;
 import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGRect;
 import org.cocos2d.types.CGSize;
@@ -31,21 +33,26 @@ import static es.dev.game.config.Constants.*;
 public class GameLayer extends CCColorLayer implements SensorEventListener{
 
 	private Context context; 
-	
+	private  static CCLabel punctuation;
 	protected ArrayList<CCSprite> targets;
 	
-	private static CCSprite background;
+	//private static CCSprite background;
     private static CCSprite player;
     private static CGPoint point;
     private static CGSize winSize;
     private static float playerWidth;
     private static float playerHeigth;
+    private static int points;
 	
 	protected GameLayer(ccColor4B color) {
 		super(color);
 		
 		context = CCDirector.sharedDirector().getActivity();
 		
+		punctuation = CCLabel.makeLabel("Ptos: 0", CGSize.make(100.0f, 25.0f), TextAlignment.CENTER, "DEFAULT", 20.0f);
+		punctuation.setPosition(CGPoint.make(720, 450));
+		addChild(punctuation);
+	
         this.registerWithAccelerometer();
         
         targets = new ArrayList<CCSprite>();
@@ -203,6 +210,11 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
             	SoundEngine.sharedEngine().playEffect(context, R.raw.eating);
             	targets.remove(target);
             	removeChild(target, true);
+            	points++;
+            	removeChild(punctuation, true);
+            	punctuation = CCLabel.makeLabel("Ptos: "+points, CGSize.make(100.0f, 25.0f), TextAlignment.CENTER, "DEFAULT", 20.0f);
+        		punctuation.setPosition(CGPoint.make(720, 450));
+        		addChild(punctuation);
             }
         }
 	    
