@@ -303,7 +303,7 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	            }else if ( target.getTag() == ENEMY ){
 	            	SoundEngine.sharedEngine().playEffect(context, R.raw.pac_man_dies);
 	            	targets.removeAll(targets);
-	            	CCDirector.sharedDirector().replaceScene(GameOverLayer.scene("You Lose, boo"));
+	            	CCDirector.sharedDirector().replaceScene(GameOverLayer.scene("Game over !",points));
 	            	
 	            }
             }

@@ -5,9 +5,13 @@ import org.cocos2d.actions.interval.CCDelayTime;
 import org.cocos2d.actions.interval.CCSequence;
 import org.cocos2d.layers.CCColorLayer;
 import org.cocos2d.layers.CCScene;
+import org.cocos2d.menus.CCMenu;
 import org.cocos2d.menus.CCMenuItem;
+import org.cocos2d.menus.CCMenuItemImage;
 import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.nodes.CCLabel;
+import org.cocos2d.nodes.CCLabel.TextAlignment;
+import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGSize;
 import org.cocos2d.types.ccColor3B;
 import org.cocos2d.types.ccColor4B;
@@ -17,17 +21,17 @@ import android.view.MotionEvent;
 
 public class GameOverLayer extends CCColorLayer
 {
-    protected CCLabel GameOverLabel;
-    protected CCMenuItem endButton;
-    protected CCMenuItem restartGameButton;
+    protected CCLabel gameOverLabel;
+    protected CCLabel scoreLabel;
+    protected CCMenuItemImage endGameButton;
+    protected CCMenuItemImage restartGameButton;
+    protected CCMenu menu;
  
-    public static CCScene scene(String message)
+    public static CCScene scene(String message,int score)
     {
         CCScene scene = CCScene.node();
-        GameOverLayer layer = new GameOverLayer(ccColor4B.ccc4(0, 0, 0, 0));
- 
-        layer.getLabel().setString(message);
- 
+        GameOverLayer layer = new GameOverLayer(ccColor4B.ccc4(0, 0, 0, 0), message,score);
+  
         scene.addChild(layer);
  
         return scene;
@@ -35,10 +39,10 @@ public class GameOverLayer extends CCColorLayer
  
     public CCLabel getLabel()
     {
-        return GameOverLabel;
+        return gameOverLabel;
     }
  
-    protected GameOverLayer(ccColor4B color)
+    protected GameOverLayer(ccColor4B color,String message, int score)
     {
         super(color);
  
@@ -46,22 +50,39 @@ public class GameOverLayer extends CCColorLayer
  
         CGSize winSize = CCDirector.sharedDirector().displaySize();
  
-        GameOverLabel = CCLabel.makeLabel("Won't See Me", "DroidSans", 32);
-        GameOverLabel.setColor(ccColor3B.ccWHITE);
-        GameOverLabel.setPosition(winSize.width / 2.0f, winSize.height / 2.0f);
-        addChild(GameOverLabel);
+        gameOverLabel = CCLabel.makeLabel(message, "DroidSans", 32);
+        gameOverLabel.setColor(ccColor3B.ccWHITE);
+        gameOverLabel.setPosition(winSize.width / 2.0f, winSize.height / 2.0f);
+        addChild(gameOverLabel);
         
-        /*TODO:
-        endButton = new CCMenuItem(rec, cb)
-        GameOverLabel.setColor(ccColor3B.ccWHITE);
-        GameOverLabel.setPosition(winSize.width / 2.0f, winSize.height / 2.0f);
-        addChild(GameOverLabel);
-        */
+    	scoreLabel = CCLabel.makeLabel("Score: "+ score, CGSize.make(100.0f, 25.0f), TextAlignment.CENTER, "DEFAULT", 20.0f);
+		scoreLabel.setPosition(CGPoint.make(720, 450));
+		addChild(scoreLabel);
+		
+		endGameButton = CCMenuItemImage.item("endButtonNormal.png", "endButtonSelected.png", this, "processEndGameButton");
+		endGameButton.setPosition(CGPoint.ccp(100, 60));
+		restartGameButton = CCMenuItemImage.item("restartButtonNormal.png", "restartButtonSelected.png", this, "processRestartGameButton");
+		restartGameButton.setPosition(CGPoint.ccp(200, 60));
+		
+		menu = CCMenu.menu(endGameButton, restartGameButton);
+		menu.setPosition(CGPoint.ccp(0, 0));
+		addChild(menu);
         
- 
         //this.runAction(CCSequence.actions(CCDelayTime.action(3.0f), CCCallFunc.action(this, "gameOverDone")));
     }
- 
+    
+    public void processEndGameButton(){
+    	System.out.println("edngame");
+		CCDirector.sharedDirector().getActivity().finish();
+    }
+    
+    public void processRestartGameButton(){
+    	System.out.println("restartgame");
+
+    	CCDirector.sharedDirector().replaceScene(GameLayer.scene());
+
+    }
+    
     public void gameOverDone()
     {
         //CCDirector.sharedDirector().replaceScene(GameLayer.scene());
