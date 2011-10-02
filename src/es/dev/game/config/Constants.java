@@ -16,6 +16,9 @@ public interface Constants {
 	public static int TRES = 3;
 	public static int ZERO = 0;
 	
+	public static int END_GAME_BUTTON = 0;
+	public static int RESTART_GAME_BUTTON = 1;
+	
 	
 	
 	public static Boolean DEBUG = true;

@@ -18,6 +18,9 @@ import org.cocos2d.types.ccColor4B;
 
 import android.view.MotionEvent;
 
+import static es.dev.game.config.Constants.*;
+
+
 
 public class GameOverLayer extends CCColorLayer
 {
@@ -59,9 +62,11 @@ public class GameOverLayer extends CCColorLayer
 		scoreLabel.setPosition(CGPoint.make(720, 450));
 		addChild(scoreLabel);
 		
-		endGameButton = CCMenuItemImage.item("endButtonNormal.png", "endButtonSelected.png", this, "processEndGameButton");
+		endGameButton = CCMenuItemImage.item("endButtonNormal.png", "endButtonSelected.png", this, "callback");
+		endGameButton.setTag(END_GAME_BUTTON);
 		endGameButton.setPosition(CGPoint.ccp(100, 60));
-		restartGameButton = CCMenuItemImage.item("restartButtonNormal.png", "restartButtonSelected.png", this, "processRestartGameButton");
+		restartGameButton = CCMenuItemImage.item("restartButtonNormal.png", "restartButtonSelected.png", this, "callback");
+		restartGameButton.setTag(RESTART_GAME_BUTTON);
 		restartGameButton.setPosition(CGPoint.ccp(200, 60));
 		
 		menu = CCMenu.menu(endGameButton, restartGameButton);
@@ -71,18 +76,18 @@ public class GameOverLayer extends CCColorLayer
         //this.runAction(CCSequence.actions(CCDelayTime.action(3.0f), CCCallFunc.action(this, "gameOverDone")));
     }
     
-    public void processEndGameButton(){
-    	System.out.println("edngame");
-		CCDirector.sharedDirector().getActivity().finish();
-    }
-    
-    public void processRestartGameButton(){
-    	System.out.println("restartgame");
+    public void callback(Object sender){
+		System.out.println("callback");
 
-    	CCDirector.sharedDirector().replaceScene(GameLayer.scene());
-
-    }
+    	CCMenuItemImage menuItem = (CCMenuItemImage) sender;
+    	if (menuItem.getTag() == END_GAME_BUTTON){
+    		CCDirector.sharedDirector().getActivity().finish();
+    	} else if (menuItem.getTag() == RESTART_GAME_BUTTON){
+        	CCDirector.sharedDirector().replaceScene(GameLayer.scene());
+		}
     
+	}
+    /*
     public void gameOverDone()
     {
         //CCDirector.sharedDirector().replaceScene(GameLayer.scene());
@@ -95,4 +100,5 @@ public class GameOverLayer extends CCColorLayer
  
         return true;
     }
+    */
 }
