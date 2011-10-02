@@ -64,13 +64,13 @@ public class GameOverLayer extends CCColorLayer
 		
 		endGameButton = CCMenuItemImage.item("endButtonNormal.png", "endButtonSelected.png", this, "callback");
 		endGameButton.setTag(END_GAME_BUTTON);
-		endGameButton.setPosition(CGPoint.ccp(100, 60));
+		endGameButton.setPosition(CGPoint.ccp(170, 0));
 		restartGameButton = CCMenuItemImage.item("restartButtonNormal.png", "restartButtonSelected.png", this, "callback");
 		restartGameButton.setTag(RESTART_GAME_BUTTON);
-		restartGameButton.setPosition(CGPoint.ccp(200, 60));
+		restartGameButton.setPosition(CGPoint.ccp(0, 0));
 		
 		menu = CCMenu.menu(endGameButton, restartGameButton);
-		menu.setPosition(CGPoint.ccp(0, 0));
+		menu.setPosition(CGPoint.ccp((winSize.width / 2)-75, 170));
 		addChild(menu);
         
         //this.runAction(CCSequence.actions(CCDelayTime.action(3.0f), CCCallFunc.action(this, "gameOverDone")));

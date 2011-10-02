@@ -215,6 +215,8 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	@Override
     public void onSensorChanged(SensorEvent event) {
 		float tmpAxisY = 0;
+		float playerWidth = GameLayer.playerWidth -10;
+		float playerHeigth = GameLayer.playerHeigth -10;
 		
 		if (DEBUG)
 			System.out.println("GameLayer.Class,  OnSensorChanged");
