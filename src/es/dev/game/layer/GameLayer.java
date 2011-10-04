@@ -3,7 +3,9 @@ package es.dev.game.layer;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.cocos2d.actions.base.CCRepeatForever;
 import org.cocos2d.actions.instant.CCCallFuncN;
+import org.cocos2d.actions.interval.CCMoveBy;
 import org.cocos2d.actions.interval.CCMoveTo;
 import org.cocos2d.actions.interval.CCSequence;
 import org.cocos2d.layers.CCColorLayer;
@@ -11,6 +13,7 @@ import org.cocos2d.layers.CCScene;
 import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.nodes.CCLabel;
 import org.cocos2d.nodes.CCNode;
+import org.cocos2d.nodes.CCParallaxNode;
 import org.cocos2d.nodes.CCSprite;
 import org.cocos2d.nodes.CCLabel.TextAlignment;
 import org.cocos2d.types.CGPoint;
@@ -41,6 +44,10 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	protected ArrayList<CCSprite> targets;
 	//private static CCSprite background;
     private static CCSprite player;
+    private static CCSprite para1;
+    private static CCSprite para2;
+    private static CCSprite para3;
+    private static CCSprite para4;
     private static CGPoint point;
     private static CGSize winSize;
     private static float playerWidth;
@@ -75,7 +82,36 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 		point = CGPoint.ccp(winSize.width / 2.0f, winSize.height / 2.0f);
 		player.setPosition(point);
 		 
-		addChild(player);
+		addChild(player,5);
+		
+		/*
+		 * Adding parallax effect to the layer
+		 */
+		para1 = CCSprite.sprite("parallax1.png");
+		para2 = CCSprite.sprite("parallax2.png");
+		para3 = CCSprite.sprite("parallax3.png");
+		para4 = CCSprite.sprite("parallax4.png");
+		
+		para1.setAnchorPoint(CGPoint.make(0, 1));
+		para2.setAnchorPoint(CGPoint.make(0, 1));
+		para3.setAnchorPoint(CGPoint.make(0, 0.6f));
+		para4.setAnchorPoint(CGPoint.make(0, 0));		
+				
+		CCParallaxNode paraNode = CCParallaxNode.node();
+		paraNode.addChild(para1, 1, 0.5f, 0, 0, winSize.height);
+		paraNode.addChild(para2, 2, 1, 0, 0, winSize.height);
+		paraNode.addChild(para3, 4, 2, 0, 0, winSize.height / 2.0f);
+		paraNode.addChild(para4, 3, 3, 0, 0, 0);
+		
+		addChild(paraNode, 0, 0);
+		
+		CCMoveBy move1 = CCMoveBy.action(20, CGPoint.make(-160, 0));
+		CCMoveBy move2 = CCMoveBy.action(-15, CGPoint.make(160, 0));
+
+		CCSequence sequence = CCSequence.actions(move1, move2);
+		CCRepeatForever repeat = CCRepeatForever.action(sequence);
+		
+		paraNode.runAction(repeat);
 		
 		/*Adds a background to the scene*/
 		//background = CCSprite.sprite("background.png");		//TODO: puede ser en 2D!!!
@@ -122,7 +158,7 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	    pos.y = actualY;
 	    target.setPosition(pos);
 	    target.setTag(GHOST);
-	    addChild(target);
+	    addChild(target,5);
 	    
 	    targets.add(target);
 	 
@@ -183,7 +219,7 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	    pos.y = actualY;
 	    enemy.setPosition(pos);
 	    enemy.setTag(ENEMY);
-	    addChild(enemy);
+	    addChild(enemy,5);
 	    
 	    targets.add(enemy);
 	 
