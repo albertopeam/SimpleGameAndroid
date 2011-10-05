@@ -53,9 +53,14 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
     private static float playerWidth;
     private static float playerHeigth;
     private int points = 0;
-    private static int playMethod = PLAY_METHOD_HORIZONTAL;
+    private static int playMethod = PLAY_METHOD_NORMAL;
     private int count = 0;
+    private float inclination = NOT_INIT;
 	
+    /**
+     * Constructor
+     * @param color
+     */
 	protected GameLayer(ccColor4B color) {
 		super(color);
 		
@@ -250,12 +255,15 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 	 */
 	@Override
     public void onSensorChanged(SensorEvent event) {
+		
 		float tmpAxisY = 0;
 		float playerWidth = GameLayer.playerWidth -10;
 		float playerHeigth = GameLayer.playerHeigth -10;
-		
+		if (inclination == NOT_INIT)
+			inclination = event.values[AxisY];
 		if (DEBUG)
-			System.out.println("GameLayer.Class,  OnSensorChanged");
+			System.out.println("GameLayer.Class, inclinacion: "+inclination);
+		
 		switch (playMethod) {
 			case PLAY_METHOD_HORIZONTAL:
 				if (point.x >= playerWidth && point.x <= (winSize.width - playerWidth)){			//Dentro de las posiciones validas del eje X
@@ -282,26 +290,34 @@ public class GameLayer extends CCColorLayer implements SensorEventListener{
 			case PLAY_METHOD_NORMAL:
 				
 				if (point.x >= playerWidth && point.x <= (winSize.width - playerWidth)){			//Dentro de las posiciones validas del eje X
-					point.x += event.values[AxisX]*3;
+					point.x += event.values[AxisX]*CUATRO;
 				}else{
 					if ( point.x < playerWidth && point.x + event.values[AxisX] >= point.x){		//Retorno de minima pos eje X
-						point.x += event.values[AxisX]*2;
+						point.x += event.values[AxisX]*CUATRO;
 					}else if ( point.x > (winSize.width - playerWidth) && point.x + event.values[AxisX] <= point.x ){		//Retorno de max. pos eje y
-						point.x += event.values[AxisX]*2;
+						point.x += event.values[AxisX]*CUATRO;
 					}
 				}
-				if (event.values[AxisY] >= 2 && event.values[AxisY] >= -1)
-					tmpAxisY -= 2;
-				else 
-					tmpAxisY = 0;
+
+				/*
+				 * offset in the Axis y to play oriented, and muls by the factor to do the movement faster
+				 */
+				tmpAxisY  = event.values[AxisY] - inclination;
+				tmpAxisY *= TRES;
+				
+				if ( tmpAxisY < inclination)	//adjust to balance the initial offset
+					tmpAxisY *= 3;
 					
+				System.out.println("--------axisY"+event.values[AxisY]);
+				System.out.println("--------tmpAxisy"+tmpAxisY);
+
 				if (point.y >= playerHeigth && point.y <= (winSize.height - playerHeigth)){			//Dentro de las posiciones validas del eje X
-					point.y -= tmpAxisY*2;
+					point.y -= tmpAxisY;
 				}else {
-					if ( point.y < playerHeigth && point.y - event.values[AxisY] >= point.y){		//Retorno de minima pos eje Y
-						point.y -= tmpAxisY*2;
-					}else if ( point.y > (winSize.height - playerHeigth) && point.y - event.values[AxisY] <= point.y ){		//Retorno de max. pos eje y
-						point.y -= tmpAxisY*2;
+					if ( point.y < playerHeigth && point.y - tmpAxisY >= point.y){		//Retorno de minima pos eje Y
+						point.y -= tmpAxisY;
+					}else if ( point.y > (winSize.height - playerHeigth) && point.y - tmpAxisY <= point.y ){		//Retorno de max. pos eje y
+						point.y -= tmpAxisY;
 					}
 				}
 				break;
